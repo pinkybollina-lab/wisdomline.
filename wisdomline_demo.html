@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WisdomLine — Call a Mentor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#1B1A2E; --bg2:#241F3D;
+    --card:#FFF8EE; --card2:#FDEFD9;
+    --ink:#2A2318; --ink-soft:#7A6E58;
+    --light:#F3EEE3; --light-soft:rgba(243,238,227,0.65);
+    --gold:#E8A33D; --gold-deep:#C97F1F;
+    --teal:#3AC7A0; --coral:#FF7F66; --decline:#E5576B;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; min-height:100vh; background:radial-gradient(circle at 80% 0%, var(--bg2), var(--bg1) 60%);
+    font-family:'Nunito',sans-serif; color:var(--light); padding:24px; font-size:16px;}
+  .wrap{max-width:960px; margin:0 auto;}
+  h1,h2,h3{font-family:'Quicksand',sans-serif;}
+
+  #landing{text-align:center; padding:44px 16px 26px;}
+  .orb{width:140px;height:140px;margin:0 auto 26px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--gold), var(--gold-deep));
+    display:flex;align-items:center;justify-content:center;font-size:48px;
+    box-shadow:0 0 0 0 rgba(232,163,61,0.5); animation:pulse 1.8s infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(232,163,61,.55);}70%{box-shadow:0 0 0 24px rgba(232,163,61,0);}100%{box-shadow:0 0 0 0 rgba(232,163,61,0);}}
+  .tagline{font-size:25px; font-weight:700; margin:0 0 6px;}
+  .subtag{color:var(--light-soft); font-size:14.5px; max-width:480px; margin:0 auto 30px; line-height:1.6;}
+  .two-path{display:flex; gap:14px; justify-content:center; flex-wrap:wrap;}
+  .path-btn{border:none; border-radius:16px; padding:20px 26px; cursor:pointer; font-family:'Quicksand'; text-align:left; width:230px;}
+  .path-btn .em{font-size:26px;}
+  .path-btn .t{font-size:16px; font-weight:700; margin-top:6px;}
+  .path-btn .d{font-size:12px; margin-top:4px; opacity:.85;}
+  .junior{background:var(--teal); color:#08281F;}
+  .senior{background:var(--gold); color:#3A2600;}
+
+  #inCall{display:none;}
+  .call-bar{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;}
+  .call-status{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--light-soft);}
+  .call-dot{width:8px;height:8px;border-radius:50%;background:var(--teal); animation:pulse 1.6s infinite;}
+  .hangup{background:transparent; border:1px solid var(--decline); color:var(--decline); border-radius:999px; padding:7px 16px; font-size:12.5px; cursor:pointer;}
+
+  .card{background:var(--card); color:var(--ink); border-radius:18px; padding:22px; margin-bottom:16px; box-shadow:0 10px 30px rgba(0,0,0,0.25);}
+  .agent-line{font-size:18px; font-weight:700; line-height:1.5; font-family:'Quicksand';}
+  .agent-sub{color:var(--ink-soft); font-size:13px; margin-top:6px;}
+
+  .talk-row{display:flex; gap:12px; align-items:center; margin-top:18px; flex-wrap:wrap;}
+  .mic-btn{background:var(--coral); color:#2B1409; border:none; border-radius:999px; padding:14px 26px; font-size:15px; font-weight:700; cursor:pointer; font-family:'Quicksand';}
+  .mic-btn.listening{background:var(--decline); animation:pulse 1s infinite;}
+  .type-fallback{flex:1; min-width:220px; display:flex; gap:8px;}
+  .type-fallback input{flex:1; padding:11px 13px; border-radius:10px; border:1px solid #E4D9C8; font-family:'Nunito'; font-size:14px;}
+  .type-fallback button{background:var(--ink); color:#fff; border:none; border-radius:10px; padding:0 16px; cursor:pointer; font-size:13px;}
+
+  .match-box{margin-top:16px; background:var(--card2); border-radius:13px; padding:14px; display:none;}
+  .match-box .who{font-family:'Quicksand'; font-weight:700; font-size:15px;}
+  .match-box .why{font-size:12.5px; color:var(--ink-soft); margin-top:3px;}
+
+  .transcript{margin-top:16px; max-height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;}
+  .bubble{max-width:85%; padding:11px 14px; border-radius:14px; font-size:14.5px; line-height:1.5;}
+  .bubble.agent{background:var(--card2); color:var(--ink); border-bottom-left-radius:4px; align-self:flex-start;}
+  .bubble.you{background:var(--coral); color:#2B1409; border-bottom-right-radius:4px; align-self:flex-end;}
+
+  .library{background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.15); border-radius:16px; padding:18px;}
+  .library h3{margin:0 0 4px; font-size:15px;}
+  .library .sub{color:var(--light-soft); font-size:12px; margin-bottom:12px;}
+  .wisdom-card{background:rgba(255,255,255,0.06); border-radius:11px; padding:12px 14px; margin-bottom:9px;}
+  .wisdom-card .t{font-weight:700; font-size:14px; font-family:'Quicksand';}
+  .wisdom-card .s{font-size:13px; color:var(--light-soft); margin-top:3px;}
+  .wisdom-card .tags{margin-top:6px;}
+  .wisdom-card .tag{display:inline-block; font-size:10.5px; background:rgba(232,163,61,0.18); color:var(--gold); padding:2px 8px; border-radius:999px; margin-right:5px;}
+  .empty-lib{color:var(--light-soft); font-size:13px; font-style:italic;}
+
+  .foot-note{color:var(--light-soft); font-size:11.5px; margin-top:20px; line-height:1.6; text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div id="landing">
+    <div class="orb">📞</div>
+    <div class="tagline">WisdomLine</div>
+    <div class="subtag">Retired experts have the time and the knowledge. Busy juniors have neither the time to search nor the network to ask. One phone call closes that gap — and every call becomes wisdom someone else can find later, without needing the call at all.</div>
+    <div class="two-path">
+      <button class="path-btn junior" id="juniorBtn"><div class="em">🎓</div><div class="t">I need guidance</div><div class="d">Talk to a matched mentor right now</div></button>
+      <button class="path-btn senior" id="seniorBtn"><div class="em">🧓</div><div class="t">I want to mentor</div><div class="d">Share what you know, by voice</div></button>
+    </div>
+  </div>
+
+  <div id="inCall">
+    <div class="call-bar">
+      <div class="call-status"><span class="call-dot"></span><span id="callStatusText">Call connected</span></div>
+      <button class="hangup" id="hangupBtn">End call</button>
+    </div>
+
+    <div class="card">
+      <div class="agent-line" id="agentLine">Loading…</div>
+      <div class="agent-sub" id="agentSub"></div>
+
+      <div class="talk-row" id="talkRow">
+        <button class="mic-btn" id="micBtn">🎙️ Tap to talk</button>
+        <div class="type-fallback">
+          <input id="typeInput" placeholder="No mic? Type here instead…">
+          <button id="typeSend">Send</button>
+        </div>
+      </div>
+
+      <div class="match-box" id="matchBox">
+        <div class="who" id="matchWho"></div>
+        <div class="why" id="matchWhy"></div>
+      </div>
+
+      <div class="transcript" id="transcript"></div>
+    </div>
+
+    <div class="library">
+      <h3>📚 The Wisdom Library</h3>
+      <div class="sub">Every call adds a permanent, searchable card here — so the next person doesn't need a live call at all.</div>
+      <div id="libraryList"><div class="empty-lib">No wisdom captured yet — be the first call.</div></div>
+    </div>
+  </div>
+
+  <div class="foot-note">Demo note: uses your browser's mic and speech synthesis to stand in for a real phone line, and calls Claude (claude-sonnet-4-6) live to match mentors, generate responses, and extract knowledge cards. The Wisdom Library is shared demo storage, visible to anyone using this app.</div>
+</div>
+
+<script>
+const MENTORS = [
+  {id:'margaret', name:'Margaret Chen', bg:'71 — 35 years as a small-business accountant', tags:['finance','budgeting','small business','taxes']},
+  {id:'robert', name:'Robert Diallo', bg:'68 — retired electrical engineer and factory floor manager', tags:['engineering','leadership','manufacturing','problem-solving']},
+  {id:'elena', name:'Elena Petrova', bg:'74 — retired schoolteacher and school principal', tags:['teaching','parenting','conflict resolution','communication']},
+  {id:'james', name:"James O'Connor", bg:'66 — 40 years as a carpenter and small contractor', tags:['trades','craftsmanship','running a small business','negotiation']},
+  {id:'priya', name:'Priya Nair', bg:'70 — retired HR director at a multinational company', tags:['career advice','salary negotiation','workplace conflict','resumes']},
+];
+
+let addedMentors = [];
+let state = { mode:null, stage:'ask' };
+
+const agentLine = document.getElementById('agentLine');
+const agentSub = document.getElementById('agentSub');
+const transcriptEl = document.getElementById('transcript');
+const matchBox = document.getElementById('matchBox');
+const libraryList = document.getElementById('libraryList');
+const micBtn = document.getElementById('micBtn');
+
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = SR ? new SR() : null;
+if(recognition){ recognition.continuous=false; recognition.interimResults=false; recognition.lang='en-US'; }
+
+function speak(text){
+  agentLine.textContent = text;
+  addBubble('agent', text);
+  if(!window.speechSynthesis) return;
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.rate = 0.98;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utter);
+}
+function addBubble(who, text){
+  const b = document.createElement('div');
+  b.className='bubble '+(who==='agent'?'agent':'you');
+  b.textContent = text;
+  transcriptEl.appendChild(b);
+  transcriptEl.scrollTop = transcriptEl.scrollHeight;
+}
+function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+// ---- Shared library storage ----
+async function loadLibrary(){
+  try{
+    const res = await window.storage.get('wisdomline:library', true);
+    return res ? JSON.parse(res.value) : [];
+  }catch(e){ return []; }
+}
+async function saveToLibrary(card){
+  const lib = await loadLibrary();
+  lib.unshift(card);
+  try{ await window.storage.set('wisdomline:library', JSON.stringify(lib.slice(0,50)), true); }catch(e){ console.error(e); }
+  renderLibrary(lib);
+}
+function renderLibrary(lib){
+  if(!lib.length){ libraryList.innerHTML = '<div class="empty-lib">No wisdom captured yet — be the first call.</div>'; return; }
+  libraryList.innerHTML = lib.slice(0,8).map(c=>`
+    <div class="wisdom-card">
+      <div class="t">${escapeHtml(c.title)}</div>
+      <div class="s">${escapeHtml(c.summary)} <i>— from a call with ${escapeHtml(c.mentor)}</i></div>
+      <div class="tags">${(c.tags||[]).map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
+    </div>`).join('');
+}
+loadLibrary().then(renderLibrary);
+
+async function loadMentorPool(){
+  try{
+    const res = await window.storage.get('wisdomline:mentors', true);
+    addedMentors = res ? JSON.parse(res.value) : [];
+  }catch(e){ addedMentors = []; }
+}
+async function addMentor(m){
+  addedMentors.push(m);
+  try{ await window.storage.set('wisdomline:mentors', JSON.stringify(addedMentors), true); }catch(e){ console.error(e); }
+}
+loadMentorPool();
+
+// ---- Entry paths ----
+document.getElementById('juniorBtn').addEventListener('click', ()=> startCall('junior'));
+document.getElementById('seniorBtn').addEventListener('click', ()=> startCall('senior'));
+document.getElementById('hangupBtn').addEventListener('click', ()=>{
+  document.getElementById('inCall').style.display='none';
+  document.getElementById('landing').style.display='block';
+  speechSynthesis.cancel();
+});
+
+function startCall(mode){
+  state = {mode, stage:'ask'};
+  document.getElementById('landing').style.display='none';
+  document.getElementById('inCall').style.display='block';
+  matchBox.style.display='none';
+  transcriptEl.innerHTML='';
+  agentSub.textContent='';
+  if(mode==='junior'){
+    speak("Hi, I'm WisdomLine. What's on your mind today — career, a skill you're trying to learn, or something in life you'd like another perspective on?");
+  } else {
+    speak("Hello, thank you for being here. Tell me a little about yourself, and what you've spent your life getting good at — I'll make sure the right people can find you.");
+  }
+}
+
+micBtn.addEventListener('click', ()=>{
+  if(!recognition){ alert("Voice input isn't supported here — try the text box, or open this in Chrome."); return; }
+  micBtn.classList.add('listening'); micBtn.textContent='● Listening…';
+  recognition.start();
+});
+if(recognition){
+  recognition.onresult = (e)=> handleInput(e.results[0][0].transcript);
+  recognition.onend = ()=>{ micBtn.classList.remove('listening'); micBtn.textContent='🎙️ Tap to talk'; };
+  recognition.onerror = ()=>{ micBtn.classList.remove('listening'); micBtn.textContent='🎙️ Tap to talk'; };
+}
+document.getElementById('typeSend').addEventListener('click', ()=>{
+  const v = document.getElementById('typeInput').value.trim();
+  if(!v) return;
+  document.getElementById('typeInput').value='';
+  handleInput(v);
+});
+
+async function handleInput(text){
+  addBubble('you', text);
+  agentSub.textContent = 'thinking…';
+  if(state.mode==='junior'){
+    const result = await matchAndRespond(text);
+    agentSub.textContent = '';
+    matchBox.style.display='block';
+    document.getElementById('matchWho').textContent = `📞 Connected with ${result.matched_mentor_name}`;
+    document.getElementById('matchWhy').textContent = result.match_reason;
+    speak(result.spoken_response);
+    if(result.knowledge_card){
+      await saveToLibrary({ title: result.knowledge_card.title, summary: result.knowledge_card.summary, tags: result.knowledge_card.tags, mentor: result.matched_mentor_name });
+    }
+  } else {
+    const profile = await structureMentorProfile(text);
+    agentSub.textContent = '';
+    await addMentor(profile);
+    speak(`Thank you, ${profile.name || 'friend'}. You're now available on WisdomLine for ${((profile.expertise_tags||[]).slice(0,3).join(', ')) || 'your experience'}. The next person who needs exactly that will be matched to you.`);
+  }
+}
+
+async function matchAndRespond(issue){
+  const roster = [...MENTORS, ...addedMentors].map(m=>`${m.name} (id:${m.id}) — ${m.bg}. Expertise: ${(m.tags||m.expertise_tags||[]).join(', ')}`).join('\n');
+  const system = `You are WisdomLine, a voice agent that connects a junior person seeking guidance with the best-matched retired mentor from a roster, then delivers that mentor's advice in the mentor's own warm, first-person voice, and extracts a short reusable knowledge card from the exchange. Respond with ONLY valid JSON, no markdown, no preamble, in exactly this shape:
+{"matched_mentor_name": "name from roster", "match_reason": "one short sentence on why this mentor fits", "spoken_response": "3-5 warm, concrete, first-person sentences AS the mentor, giving real specific advice for the stated issue — not generic platitudes", "knowledge_card": {"title": "short punchy title under 8 words", "summary": "one or two sentence distilled takeaway, useful even to someone who never made this call", "tags": ["2-4 short topic tags"]}}
+Mentor roster:
+${roster}`;
+  try{
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ model:"claude-sonnet-4-6", max_tokens:500, system, messages:[{role:"user", content: issue}] })
+    });
+    const data = await r.json();
+    const block = (data.content||[]).find(b=>b.type==='text');
+    return JSON.parse(block.text.replace(/```json|```/g,'').trim());
+  }catch(e){
+    console.error('match failed, fallback', e);
+    const m = MENTORS[Math.floor(Math.random()*MENTORS.length)];
+    return { matched_mentor_name: m.name, match_reason: `Closest match on file for this topic.`, spoken_response: `Thank you for sharing that. In my experience, the first step is usually smaller than it feels — write down exactly what's worrying you, and tackle only that one piece first.`, knowledge_card: { title: 'Start with the smallest step', summary: 'When a problem feels overwhelming, isolate and act on just the first concrete piece of it.', tags: ['getting started','confidence'] } };
+  }
+}
+
+async function structureMentorProfile(text){
+  const system = `Extract a mentor profile from what this retired person said about themselves. Respond with ONLY valid JSON, no markdown: {"name": "their name if stated, else 'A WisdomLine mentor'", "bg": "one short sentence background", "expertise_tags": ["2-5 short topic tags"]}`;
+  try{
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ model:"claude-sonnet-4-6", max_tokens:200, system, messages:[{role:"user", content:text}] })
+    });
+    const data = await r.json();
+    const block = (data.content||[]).find(b=>b.type==='text');
+    const parsed = JSON.parse(block.text.replace(/```json|```/g,'').trim());
+    return { id:'m'+Date.now(), name:parsed.name, bg:parsed.bg, expertise_tags:parsed.expertise_tags };
+  }catch(e){
+    return { id:'m'+Date.now(), name:'A WisdomLine mentor', bg:text.slice(0,80), expertise_tags:['general experience'] };
+  }
+}
+</script>
+</body>
+</html>
